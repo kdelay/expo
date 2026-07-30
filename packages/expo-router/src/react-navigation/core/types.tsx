@@ -120,7 +120,8 @@ export type EventMapCore<State extends NavigationState> = {
   focus: { data: undefined };
   blur: { data: undefined };
   state: { data: { state: State } };
-  beforeRemove: { data: { action: NavigationAction }; canPreventDefault: true };
+  beforeRemove: { data: { action: NavigationAction } };
+  removePrevented: { data: { action: NavigationAction } };
 };
 
 export type EventArg<

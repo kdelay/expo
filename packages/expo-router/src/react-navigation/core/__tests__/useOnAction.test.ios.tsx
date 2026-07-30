@@ -13,6 +13,7 @@ import { BaseNavigationContainer } from '../BaseNavigationContainer';
 import { Screen } from '../Screen';
 import { createNavigationContainerRef } from '../createNavigationContainerRef';
 import { useNavigationBuilder } from '../useNavigationBuilder';
+import { usePreventRemove } from '../usePreventRemove';
 import { type MockActions, MockRouter, MockRouterKey } from './__fixtures__/MockRouter';
 
 jest.mock('nanoid/non-secure', () => {
@@ -695,7 +696,7 @@ test('logs error if no navigator handled the action', () => {
   spy.mockRestore();
 });
 
-test("prevents removing a screen with 'beforeRemove' event", () => {
+test("prevents removing a screen with 'removePrevented' event", () => {
   const TestNavigator = (props: any) => {
     const { state, descriptors, NavigationContent } = useNavigationBuilder(StackRouter, props);
 
@@ -708,25 +709,12 @@ test("prevents removing a screen with 'beforeRemove' event", () => {
 
   const onBeforeRemove = jest.fn();
 
-  let shouldPrevent = true;
-  let shouldContinue = false;
+  let setPreventRemove: React.Dispatch<React.SetStateAction<boolean>>;
 
-  const TestScreen = (props: any) => {
-    React.useEffect(
-      () =>
-        props.navigation.addListener('beforeRemove', (e: any) => {
-          onBeforeRemove();
-
-          if (shouldPrevent) {
-            e.preventDefault();
-
-            if (shouldContinue) {
-              props.navigation.dispatch(e.data.action);
-            }
-          }
-        }),
-      [props.navigation]
-    );
+  const TestScreen = () => {
+    const [preventRemove, setPreventRemoveState] = React.useState(true);
+    setPreventRemove = setPreventRemoveState;
+    usePreventRemove(preventRemove, onBeforeRemove);
 
     return null;
   };
@@ -773,8 +761,10 @@ test("prevents removing a screen with 'beforeRemove' event", () => {
       { key: 'foo-3', name: 'foo' },
       { key: 'bar-5', name: 'bar' },
       {
-        key: 'baz-6',
+        key: 'baz-7',
         name: 'baz',
+        params: undefined,
+        path: undefined,
       },
     ],
     stale: false,
@@ -793,13 +783,15 @@ test("prevents removing a screen with 'beforeRemove' event", () => {
     routes: [
       { key: 'foo-3', name: 'foo' },
       { key: 'bar-5', name: 'bar' },
-      { key: 'baz-6', name: 'baz' },
+      { key: 'baz-7', name: 'baz' },
     ],
     stale: false,
     type: 'stack',
   });
 
-  shouldPrevent = false;
+  act(() => {
+    setPreventRemove(false);
+  });
 
   act(() => ref.current?.dispatch(StackActions.popTo('foo')));
 
@@ -812,9 +804,6 @@ test("prevents removing a screen with 'beforeRemove' event", () => {
     stale: false,
     type: 'stack',
   });
-
-  shouldPrevent = true;
-  shouldContinue = true;
 
   act(() => ref.current?.navigate('bar'));
   act(() => ref.current?.navigate('foo'));
@@ -830,7 +819,7 @@ test("prevents removing a screen with 'beforeRemove' event", () => {
   });
 });
 
-test("prevents removing a child screen with 'beforeRemove' event", () => {
+test("prevents removing a child screen with 'removePrevented' event", () => {
   const TestNavigator = (props: any) => {
     const { state, descriptors, NavigationContent } = useNavigationBuilder(StackRouter, props);
 
@@ -843,25 +832,12 @@ test("prevents removing a child screen with 'beforeRemove' event", () => {
 
   const onBeforeRemove = jest.fn();
 
-  let shouldPrevent = true;
-  let shouldContinue = false;
+  let setPreventRemove: React.Dispatch<React.SetStateAction<boolean>>;
 
-  const TestScreen = (props: any) => {
-    React.useEffect(
-      () =>
-        props.navigation.addListener('beforeRemove', (e: any) => {
-          onBeforeRemove();
-
-          if (shouldPrevent) {
-            e.preventDefault();
-
-            if (shouldContinue) {
-              props.navigation.dispatch(e.data.action);
-            }
-          }
-        }),
-      [props.navigation]
-    );
+  const TestScreen = () => {
+    const [preventRemove, setPreventRemoveState] = React.useState(true);
+    setPreventRemove = setPreventRemoveState;
+    usePreventRemove(preventRemove, onBeforeRemove);
 
     return null;
   };
@@ -960,7 +936,9 @@ test("prevents removing a child screen with 'beforeRemove' event", () => {
     type: 'stack',
   });
 
-  shouldPrevent = false;
+  act(() => {
+    setPreventRemove(false);
+  });
 
   act(() => ref.current?.dispatch(StackActions.popTo('foo')));
 
@@ -973,9 +951,6 @@ test("prevents removing a child screen with 'beforeRemove' event", () => {
     stale: false,
     type: 'stack',
   });
-
-  shouldPrevent = true;
-  shouldContinue = true;
 
   act(() => ref.current?.navigate('bar'));
   act(() => ref.current?.navigate('foo'));
@@ -991,7 +966,7 @@ test("prevents removing a child screen with 'beforeRemove' event", () => {
   });
 });
 
-test("prevents removing a grand child screen with 'beforeRemove' event", () => {
+test("prevents removing a grand child screen with 'removePrevented' event", () => {
   const TestNavigator = (props: any) => {
     const { state, descriptors, NavigationContent } = useNavigationBuilder(StackRouter, props);
 
@@ -1004,25 +979,12 @@ test("prevents removing a grand child screen with 'beforeRemove' event", () => {
 
   const onBeforeRemove = jest.fn();
 
-  let shouldPrevent = true;
-  let shouldContinue = false;
+  let setPreventRemove: React.Dispatch<React.SetStateAction<boolean>>;
 
-  const TestScreen = (props: any) => {
-    React.useEffect(
-      () =>
-        props.navigation.addListener('beforeRemove', (e: any) => {
-          onBeforeRemove();
-
-          if (shouldPrevent) {
-            e.preventDefault();
-
-            if (shouldContinue) {
-              props.navigation.dispatch(e.data.action);
-            }
-          }
-        }),
-      [props.navigation]
-    );
+  const TestScreen = () => {
+    const [preventRemove, setPreventRemoveState] = React.useState(true);
+    setPreventRemove = setPreventRemoveState;
+    usePreventRemove(preventRemove, onBeforeRemove);
 
     return null;
   };
@@ -1152,7 +1114,9 @@ test("prevents removing a grand child screen with 'beforeRemove' event", () => {
     type: 'stack',
   });
 
-  shouldPrevent = false;
+  act(() => {
+    setPreventRemove(false);
+  });
 
   act(() => ref.current?.dispatch(StackActions.popTo('foo')));
 
@@ -1165,9 +1129,6 @@ test("prevents removing a grand child screen with 'beforeRemove' event", () => {
     stale: false,
     type: 'stack',
   });
-
-  shouldPrevent = true;
-  shouldContinue = true;
 
   act(() => ref.current?.navigate('bar'));
   act(() => ref.current?.navigate('foo'));
@@ -1183,7 +1144,7 @@ test("prevents removing a grand child screen with 'beforeRemove' event", () => {
   });
 });
 
-test("prevents removing by multiple screens with 'beforeRemove' event", () => {
+test("prevents removing by multiple screens with 'removePrevented' event", () => {
   const TestNavigator = (props: any) => {
     const { state, descriptors, NavigationContent } = useNavigationBuilder(StackRouter, props);
 
@@ -1200,27 +1161,15 @@ test("prevents removing by multiple screens with 'beforeRemove' event", () => {
     lex: jest.fn(),
   };
 
-  const shouldPrevent = {
-    bar: true,
-    baz: true,
-    lex: true,
-  };
+  const setPreventRemove: Record<string, React.Dispatch<React.SetStateAction<boolean>>> = {};
 
   const TestScreen = (props: any) => {
-    React.useEffect(
-      () =>
-        props.navigation.addListener('beforeRemove', (e: any) => {
-          // @ts-expect-error: we should have the required mocks
-          onBeforeRemove[props.route.name]();
-          e.preventDefault();
-
-          // @ts-expect-error: we should have the required properties
-          if (!shouldPrevent[props.route.name]) {
-            props.navigation.dispatch(e.data.action);
-          }
-        }),
-      [props.navigation, props.route.name]
-    );
+    const [preventRemove, setPreventRemoveState] = React.useState(true);
+    setPreventRemove[props.route.name] = setPreventRemoveState;
+    usePreventRemove(preventRemove, () => {
+      // @ts-expect-error: we should have the required mocks
+      onBeforeRemove[props.route.name]();
+    });
 
     return null;
   };
@@ -1260,43 +1209,7 @@ test("prevents removing by multiple screens with 'beforeRemove' event", () => {
     ref.current?.navigate('bax');
   });
 
-  const preventedState = {
-    index: 3,
-    key: 'stack-2',
-    routeNames: ['foo', 'bar', 'baz', 'bax'],
-    routes: [
-      { key: 'foo-3', name: 'foo' },
-      { key: 'bar-5', name: 'bar' },
-      { key: 'baz-6', name: 'baz' },
-      {
-        key: 'bax-7',
-        name: 'bax',
-        state: {
-          index: 0,
-          key: 'stack-9',
-          routeNames: ['qux'],
-          routes: [
-            {
-              key: 'qux-10',
-              name: 'qux',
-              state: {
-                index: 0,
-                key: 'stack-13',
-                routeNames: ['lex'],
-                routes: [{ key: 'lex-14', name: 'lex' }],
-                stale: false,
-                type: 'stack',
-              },
-            },
-          ],
-          stale: false,
-          type: 'stack',
-        },
-      },
-    ],
-    stale: false,
-    type: 'stack',
-  };
+  const preventedState = ref.current!.getRootState();
 
   expect(onStateChange).toHaveBeenCalledTimes(1);
   expect(onStateChange).toHaveBeenCalledWith(preventedState);
@@ -1308,7 +1221,9 @@ test("prevents removing by multiple screens with 'beforeRemove' event", () => {
 
   expect(ref.current?.getRootState()).toEqual(preventedState);
 
-  shouldPrevent.lex = false;
+  act(() => {
+    setPreventRemove.lex!(false);
+  });
 
   act(() => ref.current?.dispatch(StackActions.popTo('foo')));
 
@@ -1317,7 +1232,9 @@ test("prevents removing by multiple screens with 'beforeRemove' event", () => {
 
   expect(ref.current?.getRootState()).toEqual(preventedState);
 
-  shouldPrevent.baz = false;
+  act(() => {
+    setPreventRemove.baz!(false);
+  });
 
   act(() => ref.current?.dispatch(StackActions.popTo('foo')));
 
@@ -1326,7 +1243,9 @@ test("prevents removing by multiple screens with 'beforeRemove' event", () => {
 
   expect(ref.current?.getRootState()).toEqual(preventedState);
 
-  shouldPrevent.bar = false;
+  act(() => {
+    setPreventRemove.bar!(false);
+  });
 
   act(() => ref.current?.dispatch(StackActions.popTo('foo')));
 
@@ -1341,7 +1260,7 @@ test("prevents removing by multiple screens with 'beforeRemove' event", () => {
   });
 });
 
-test("prevents removing a child screen with 'beforeRemove' event with 'resetRoot'", () => {
+test("prevents removing a child screen with 'removePrevented' event with 'resetRoot'", () => {
   const TestNavigator = (props: any) => {
     const { state, descriptors, NavigationContent } = useNavigationBuilder(StackRouter, props);
 
@@ -1354,25 +1273,12 @@ test("prevents removing a child screen with 'beforeRemove' event with 'resetRoot
 
   const onBeforeRemove = jest.fn();
 
-  let shouldPrevent = true;
-  const shouldContinue = false;
+  let setPreventRemove: React.Dispatch<React.SetStateAction<boolean>>;
 
-  const TestScreen = (props: any) => {
-    React.useEffect(
-      () =>
-        props.navigation.addListener('beforeRemove', (e: any) => {
-          onBeforeRemove();
-
-          if (shouldPrevent) {
-            e.preventDefault();
-
-            if (shouldContinue) {
-              props.navigation.dispatch(e.data.action);
-            }
-          }
-        }),
-      [props.navigation]
-    );
+  const TestScreen = () => {
+    const [preventRemove, setPreventRemoveState] = React.useState(true);
+    setPreventRemove = setPreventRemoveState;
+    usePreventRemove(preventRemove, onBeforeRemove);
 
     return null;
   };
@@ -1463,7 +1369,9 @@ test("prevents removing a child screen with 'beforeRemove' event with 'resetRoot
     type: 'stack',
   });
 
-  shouldPrevent = false;
+  act(() => {
+    setPreventRemove(false);
+  });
 
   act(() =>
     ref.current?.resetRoot({

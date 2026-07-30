@@ -18,6 +18,7 @@ import type {
   DefaultNavigatorOptions,
   Descriptor,
   NavigationHelpers,
+  NavigationAction,
   NavigationProp,
   ParamListBase,
   Route,
@@ -29,6 +30,10 @@ import type {
 } from '../native';
 
 export type NativeStackNavigationEventMap = {
+  /**
+   * Event which fires when an action that removes the screen is prevented.
+   */
+  removePrevented: { data: { action: NavigationAction } };
   /**
    * Event which fires when a transition animation starts.
    */

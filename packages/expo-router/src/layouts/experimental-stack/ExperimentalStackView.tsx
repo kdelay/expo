@@ -80,8 +80,8 @@ export function ExperimentalStackView({ state, navigation, descriptors }: Props)
               }}
               onNativeDismiss={() => {
                 // Native dismissal (e.g. swipe-to-dismiss). JS state still has the route —
-                // catch up by dispatching pop and arming useDismissedRouteError so a stuck
-                // beforeRemove listener surfaces an actionable console.error.
+                // catch up by dispatching pop and arming useDismissedRouteError so a stale
+                // `usePreventRemove` surfaces an actionable console.error.
                 navigation.dispatch({
                   ...StackActions.pop(),
                   source: route.key,
@@ -90,6 +90,17 @@ export function ExperimentalStackView({ state, navigation, descriptors }: Props)
                 setNextDismissedKey(route.key);
               }}
               onNativeDismissPrevented={() => {
+                navigation.emit({
+                  type: 'removePrevented',
+                  target: route.key,
+                  data: {
+                    action: {
+                      ...StackActions.pop(),
+                      source: route.key,
+                      target: state.key,
+                    },
+                  },
+                });
                 navigation.emit({
                   type: 'gestureCancel',
                   data: undefined,
