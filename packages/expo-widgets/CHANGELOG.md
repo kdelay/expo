@@ -32,6 +32,7 @@
 ### 💡 Others
 
 - Temporarily make the Android config plugin opt-in with `enableAndroid`. ([#46463](https://github.com/expo/expo/pull/46463) by [@jakex7](https://github.com/jakex7))
+- [Android] Migrate to Peek 0.2.0 ([#48340](https://github.com/expo/expo/pull/48340) by [@jakex7](https://github.com/jakex7))
 
 ## 56.0.15 — 2026-05-26
 
