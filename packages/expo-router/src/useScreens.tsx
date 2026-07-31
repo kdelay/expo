@@ -54,11 +54,6 @@ export type ScreenProps<
 > = {
   /** Name is required when used inside a Layout component. */
   name?: string;
-  /**
-   * Redirect to the nearest sibling route.
-   * If all children are `redirect={true}`, the layout will render `null` as there are no children to render.
-   */
-  redirect?: boolean;
   initialParams?: Record<string, any>;
   options?:
     | TOptions
@@ -96,7 +91,6 @@ function getSortedChildren(
     .map(
       ({
         name,
-        redirect,
         initialParams,
         listeners,
         options,
@@ -122,14 +116,6 @@ function getSortedChildren(
           // Get match and remove from entries
           const match = entries[matchIndex];
           entries.splice(matchIndex, 1);
-
-          // Ensure to return null after removing from entries.
-          if (redirect) {
-            if (typeof redirect === 'string') {
-              throw new Error(`Redirecting to a specific route is not supported yet.`);
-            }
-            return null;
-          }
 
           if (getId) {
             console.warn(
