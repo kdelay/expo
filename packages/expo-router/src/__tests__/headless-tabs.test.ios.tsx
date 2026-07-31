@@ -344,9 +344,19 @@ it('does not reset tab content when only a trigger href changes', () => {
 
 it('does not reset tab content when triggers are reordered', () => {
   let appleMounts = 0;
+  let tabState: { routeNames: string[]; routes: string[] } | undefined;
 
   function Apple() {
     useState(() => appleMounts++);
+    return null;
+  }
+
+  function StateProbe() {
+    const { state } = useNavigatorContext();
+    tabState = {
+      routeNames: state.routeNames,
+      routes: state.routes.map((route) => route.name),
+    };
     return null;
   }
 
@@ -362,6 +372,7 @@ it('does not reset tab content when triggers are reordered', () => {
           <Tabs>
             <TabList>{reversed ? triggers.reverse() : triggers}</TabList>
             <TabSlot />
+            <StateProbe />
             <Button testID="reorder" title="Reorder" onPress={() => setReversed(true)} />
           </Tabs>
         );
@@ -375,6 +386,10 @@ it('does not reset tab content when triggers are reordered', () => {
   expect(appleMounts).toBe(1);
   fireEvent.press(screen.getByTestId('reorder'));
   expect(appleMounts).toBe(1);
+  expect(tabState).toEqual({
+    routeNames: ['orange', 'apple'],
+    routes: ['apple', 'orange'],
+  });
   act(() => router.back());
   expect(screen).toHaveSegments(['orange']);
 });

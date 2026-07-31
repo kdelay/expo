@@ -32,6 +32,7 @@ export const NativeTabsContext = React.createContext<boolean>(false);
 
 function NativeTabsContent({
   state,
+  routeNames,
   descriptors,
   actions,
   emitter,
@@ -54,7 +55,7 @@ function NativeTabsContent({
   NativeTabOptions,
   NativeTabNavigationEventMap,
   Omit<InternalNativeTabsProps, 'screenListeners'>
->) {
+> & { routeNames: string[] }) {
   if (use(NativeTabsContext)) {
     throw new Error(
       'Nesting Native Tabs inside each other is not supported natively. Use JS tabs for nesting instead.'
@@ -65,6 +66,7 @@ function NativeTabsContent({
 
   const { visibleRoutes, visibleFocusedIndex } = useHiddenTabRedirect({
     routes,
+    routeNames,
     focusedRouteKey: routes[state.index]!.key,
     descriptors,
     redirectToRouteName,
@@ -170,8 +172,11 @@ const NativeTabsNavigatorWithContext = unstable_createStandardRouterNavigator<
   TabNavigationState<ParamListBase>,
   NativeTabNavigationEventMap,
   Omit<InternalNativeTabsProps, 'screenListeners'>,
-  TabRouterOptions
->(NativeTabsContent, NativeBottomTabsRouter);
+  TabRouterOptions,
+  { routeNames: string[] }
+>(NativeTabsContent, NativeBottomTabsRouter, {
+  createProps: ({ state }) => ({ routeNames: state.routeNames }),
+});
 
 export function NativeTabsNavigatorWrapper(props: NativeTabsProps) {
   const routeNode = useRouteNode();

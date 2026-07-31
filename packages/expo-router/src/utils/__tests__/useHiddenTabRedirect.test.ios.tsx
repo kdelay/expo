@@ -33,6 +33,7 @@ const descriptors = {
   'hidden-key': { routeSource: 'layout' as const, options: { hidden: true } },
   'filesystem-key': { routeSource: 'filesystem' as const },
 };
+const routeNames = routes.map((route) => route.name);
 
 let replaceSpy: jest.SpyInstance;
 let buildHref: jest.Mock;
@@ -96,6 +97,7 @@ describe('useHiddenTabRedirect', () => {
     const { result } = renderHook(() =>
       useHiddenTabRedirect({
         routes,
+        routeNames,
         focusedRouteKey: 'settings-key',
         descriptors,
       })
@@ -109,7 +111,7 @@ describe('useHiddenTabRedirect', () => {
 
   it('returns -1 when the focused route is not visible', () => {
     const { result } = renderHook(() =>
-      useHiddenTabRedirect({ routes, focusedRouteKey: 'hidden-key', descriptors })
+      useHiddenTabRedirect({ routes, routeNames, focusedRouteKey: 'hidden-key', descriptors })
     );
 
     expect(result.current.visibleFocusedIndex).toBe(-1);
@@ -119,6 +121,7 @@ describe('useHiddenTabRedirect', () => {
     renderHook(() =>
       useHiddenTabRedirect({
         routes,
+        routeNames,
         focusedRouteKey: 'hidden-key',
         descriptors,
         redirectToRouteName: 'settings',
@@ -133,6 +136,7 @@ describe('useHiddenTabRedirect', () => {
     renderHook(() =>
       useHiddenTabRedirect({
         routes,
+        routeNames,
         focusedRouteKey: 'hidden-key',
         descriptors,
         redirectToRouteName: 'settings',
@@ -146,6 +150,7 @@ describe('useHiddenTabRedirect', () => {
     renderHook(() =>
       useHiddenTabRedirect({
         routes,
+        routeNames,
         focusedRouteKey: 'hidden-key',
         descriptors,
         redirectToRouteName: 'missing',
@@ -159,13 +164,17 @@ describe('useHiddenTabRedirect', () => {
   it('does not redirect when the navigator is unfocused', () => {
     mockedUseIsFocused.mockReturnValue(false);
 
-    renderHook(() => useHiddenTabRedirect({ routes, focusedRouteKey: 'hidden-key', descriptors }));
+    renderHook(() =>
+      useHiddenTabRedirect({ routes, routeNames, focusedRouteKey: 'hidden-key', descriptors })
+    );
 
     expect(replaceSpy).not.toHaveBeenCalled();
   });
 
   it('does not redirect when the focused route is visible', () => {
-    renderHook(() => useHiddenTabRedirect({ routes, focusedRouteKey: 'home-key', descriptors }));
+    renderHook(() =>
+      useHiddenTabRedirect({ routes, routeNames, focusedRouteKey: 'home-key', descriptors })
+    );
 
     expect(buildHref).toHaveBeenCalledWith(routes[0]);
     expect(replaceSpy).not.toHaveBeenCalled();
@@ -175,11 +184,26 @@ describe('useHiddenTabRedirect', () => {
     renderHook(() =>
       useHiddenTabRedirect({
         routes: [routes[2]!],
+        routeNames: ['hidden'],
         focusedRouteKey: 'hidden-key',
         descriptors,
       })
     );
 
     expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it('orders visible routes and redirect fallback by route names', () => {
+    const { result } = renderHook(() =>
+      useHiddenTabRedirect({
+        routes,
+        routeNames: ['settings/index', 'home', 'hidden', 'filesystem'],
+        focusedRouteKey: 'hidden-key',
+        descriptors,
+      })
+    );
+
+    expect(result.current.visibleRoutes).toEqual([routes[1], routes[0]]);
+    expect(replaceSpy).toHaveBeenCalledWith('/href/settings/index');
   });
 });

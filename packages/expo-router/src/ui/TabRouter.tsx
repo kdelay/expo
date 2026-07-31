@@ -7,7 +7,6 @@ import {
   type TabRouterOptions as RNTabRouterOptions,
   TabRouter as RNTabRouter,
 } from '../react-navigation/native';
-import { getRouteHistory } from '../react-navigation/routers/TabRouter';
 import type { TriggerMap } from './common';
 
 export type ExpoTabRouterOptions = RNTabRouterOptions & {
@@ -17,12 +16,6 @@ export type ExpoTabRouterOptions = RNTabRouterOptions & {
 export type ExpoTabActionType =
   | RNTabActionType
   | CommonNavigationAction
-  | {
-      type: 'EXPO_ROUTER_TAB_ORDER_CHANGED';
-      source?: string;
-      target?: string;
-      payload: { routeNames: string[] };
-    }
   | {
       type: 'JUMP_TO';
       source?: string;
@@ -42,49 +35,8 @@ export function ExpoTabRouter(options: ExpoTabRouterOptions) {
     ExpoTabActionType | CommonNavigationAction
   > = {
     ...rnTabRouter,
-    getStateForRouteNamesChange(state, options) {
-      return state;
-    },
     getStateForAction(state, action, routerConfigOptions) {
-      if (action.type === 'EXPO_ROUTER_TAB_ORDER_CHANGED') {
-        // Reorder `state.routes` to the new trigger order, reusing the existing route
-        // objects by name so keys and screen state survive.
-        const { routeNames } = action.payload;
-        const routes = routeNames.map((name) => state.routes.find((r) => r.name === name));
-
-        if (routes.length !== state.routes.length || routes.some((route) => route == null)) {
-          // The set of routes changed, not just the order. Not this action's job.
-          return state;
-        }
-
-        const focusedKey = state.routes[state.index]!.key;
-        const index = routes.findIndex((route) => route!.key === focusedKey);
-
-        const backBehavior = options.backBehavior ?? 'firstRoute';
-        let history = state.history;
-        if (
-          backBehavior === 'firstRoute' ||
-          backBehavior === 'initialRoute' ||
-          backBehavior === 'order'
-        ) {
-          // These behaviors derive history from route order, so recompute it.
-          // `history` back behavior keeps its visit history untouched.
-          history = getRouteHistory(
-            routes as typeof state.routes,
-            index,
-            backBehavior,
-            options.initialRouteName
-          );
-        }
-
-        return {
-          ...state,
-          routeNames,
-          routes: routes as typeof state.routes,
-          index,
-          history,
-        };
-      } else if (action.type !== 'JUMP_TO') {
+      if (action.type !== 'JUMP_TO') {
         return rnTabRouter.getStateForAction(state, action, routerConfigOptions);
       }
 

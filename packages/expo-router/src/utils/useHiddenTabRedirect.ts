@@ -8,6 +8,7 @@ import {
   useIsFocused,
 } from '../react-navigation/native';
 import { useBuildHref } from '../standard-navigation/useBuildHref';
+import { orderRoutesByRouteNames } from './orderRoutesByRouteNames';
 
 type TabRoute = NavigationRoute<ParamListBase, string>;
 
@@ -21,11 +22,13 @@ type TabDescriptor = {
  */
 export function useHiddenTabRedirect<Route extends TabRoute>({
   routes,
+  routeNames,
   focusedRouteKey,
   descriptors,
   redirectToRouteName,
 }: {
   routes: Route[];
+  routeNames: string[];
   focusedRouteKey: string;
   descriptors: Record<string, TabDescriptor>;
   redirectToRouteName?: string;
@@ -35,11 +38,11 @@ export function useHiddenTabRedirect<Route extends TabRoute>({
 
   const visibleRoutes = useMemo(
     () =>
-      routes.filter((route) => {
+      orderRoutesByRouteNames(routes, routeNames).filter((route) => {
         const descriptor = descriptors[route.key];
         return isDeclaredInLayout(descriptor) && !isHidden(descriptor);
       }),
-    [routes, descriptors]
+    [routes, routeNames, descriptors]
   );
   const visibleFocusedIndex = useMemo(
     () => visibleRoutes.findIndex((route) => route.key === focusedRouteKey),

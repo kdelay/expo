@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactElement, ReactNode, PropsWithChildren } from 'react';
-import { Children, Fragment, isValidElement, use, useLayoutEffect, useMemo, useRef } from 'react';
+import { Children, Fragment, isValidElement, use, useMemo } from 'react';
 import type { ViewProps } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 
@@ -185,27 +185,9 @@ export function useTabsWithTriggers(options: UseTabsWithTriggersOptions): TabsCo
     NavigationContent: RNNavigationContent,
   } = navigatorContext;
 
-  // `state.routeNames` keeps the mount-time order, so derive the current order from the
-  // rendered screens and ask the router to reorder its state when it changes.
-  const routeNames = children.map((child) => (child as ReactElement<{ name: string }>).props.name);
-  const routeNamesKey = JSON.stringify(routeNames);
-  const previousRouteNamesKeyRef = useRef(routeNamesKey);
-  useLayoutEffect(() => {
-    if (previousRouteNamesKeyRef.current === routeNamesKey) {
-      return;
-    }
-    previousRouteNamesKeyRef.current = routeNamesKey;
-    navigation.dispatch((state) => ({
-      type: 'EXPO_ROUTER_TAB_ORDER_CHANGED',
-      target: state.key,
-      payload: { routeNames },
-    }));
-    // `routeNames` is a fresh array each render; `routeNamesKey` stands in for it.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeNamesKey, navigation]);
-
   useHiddenTabRedirect({
     routes: state.routes,
+    routeNames: state.routeNames,
     focusedRouteKey: state.routes[state.index]!.key,
     descriptors,
     redirectToRouteName: initialRouteName,

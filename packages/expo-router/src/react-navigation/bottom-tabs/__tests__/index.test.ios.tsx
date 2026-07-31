@@ -1,5 +1,6 @@
 import { afterEach, expect, jest, test } from '@jest/globals';
 import { act, fireEvent, render } from '@testing-library/react-native';
+import { useState } from 'react';
 import {
   type EmitterSubscription,
   Keyboard,
@@ -50,6 +51,42 @@ test('renders a bottom tab navigator with screens', async () => {
 
   fireEvent.press(getByRole('button', { name: 'B, tab, 2 of 2' }), {});
 
+  expect(queryByText('Screen B')).not.toBeNull();
+});
+
+test('renders tabs in route names order while preserving focus', () => {
+  const Tab = createBottomTabNavigator<BottomTabParamList>();
+  let reverse!: () => void;
+
+  function TestNavigator() {
+    const [reversed, setReversed] = useState(false);
+    reverse = () => setReversed(true);
+    const screens = [
+      <Tab.Screen key="A" name="A">
+        {() => <Text>Screen A</Text>}
+      </Tab.Screen>,
+      <Tab.Screen key="B" name="B">
+        {() => <Text>Screen B</Text>}
+      </Tab.Screen>,
+    ];
+    return <Tab.Navigator>{reversed ? screens.reverse() : screens}</Tab.Navigator>;
+  }
+
+  const { getByRole, queryByText } = render(
+    <NavigationContainer>
+      <TestNavigator />
+    </NavigationContainer>
+  );
+
+  fireEvent.press(getByRole('button', { name: 'B, tab, 2 of 2' }));
+  act(reverse);
+
+  expect(getByRole('button', { name: 'B, tab, 1 of 2' }).props.accessibilityState).toEqual({
+    selected: true,
+  });
+  expect(getByRole('button', { name: 'A, tab, 2 of 2' }).props.accessibilityState).toEqual({
+    selected: false,
+  });
   expect(queryByText('Screen B')).not.toBeNull();
 });
 
