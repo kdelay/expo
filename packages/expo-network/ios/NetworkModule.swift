@@ -97,7 +97,7 @@ public final class NetworkModule: Module {
 
     tempMonitor.pathUpdateHandler = { updatedPath in
       tempPath = updatedPath
-      semaphore.signal() // Notify that we got the path
+      semaphore.signal()  // Notify that we got the path
     }
 
     tempMonitor.start(queue: monitorQueue)
@@ -124,7 +124,7 @@ public final class NetworkModule: Module {
       return [
         "type": NetworkType.none.description,
         "isConnected": isConnected,
-        "isInternetReachable": isConnected
+        "isInternetReachable": isConnected,
       ]
     }
 
@@ -149,7 +149,7 @@ public final class NetworkModule: Module {
     return [
       "type": currentNetworkType.description,
       "isConnected": isConnected,
-      "isInternetReachable": isConnected
+      "isInternetReachable": isConnected,
     ]
   }
 }

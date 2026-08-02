@@ -18,7 +18,8 @@ class SplashScreenManager: NSObject, RCTReloadListener {
 
     self.rootView = rootView
     showSplashScreen()
-    NotificationCenter.default.addObserver(self, selector: #selector(onAppReady), name: Notification.Name("RCTContentDidAppearNotification"), object: nil)
+    NotificationCenter.default.addObserver(
+      self, selector: #selector(onAppReady), name: Notification.Name("RCTContentDidAppearNotification"), object: nil)
   }
 
   @objc private func onAppReady() {
@@ -57,7 +58,8 @@ class SplashScreenManager: NSObject, RCTReloadListener {
   }
 
   private func showSplashScreen() {
-    let splashScreenFilename = Bundle.main.object(forInfoDictionaryKey: "UILaunchStoryboardName") as? String ?? "SplashScreen"
+    let splashScreenFilename =
+      Bundle.main.object(forInfoDictionaryKey: "UILaunchStoryboardName") as? String ?? "SplashScreen"
     // Prevents crashes in brownfield apps where the splash screen storyboard may not be present.
     guard Bundle.main.path(forResource: splashScreenFilename, ofType: "storyboardc") != nil else {
       return
@@ -92,6 +94,7 @@ class SplashScreenManager: NSObject, RCTReloadListener {
   }
 
   func removeObservers() {
-    NotificationCenter.default.removeObserver(self, name: Notification.Name("RCTContentDidAppearNotification"), object: nil)
+    NotificationCenter.default.removeObserver(
+      self, name: Notification.Name("RCTContentDidAppearNotification"), object: nil)
   }
 }

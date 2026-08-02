@@ -49,7 +49,8 @@ public class DocumentPickerModule: Module, PickingResultHandler {
 
   func didPickDocumentsAt(urls: [URL]) {
     guard let options = self.pickingContext?.options,
-      let promise = self.pickingContext?.promise else {
+      let promise = self.pickingContext?.promise
+    else {
       log.error("Picking context has been lost.")
       return
     }

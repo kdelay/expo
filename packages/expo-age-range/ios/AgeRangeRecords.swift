@@ -1,5 +1,5 @@
-import ExpoModulesCore
 import DeclaredAgeRange
+import ExpoModulesCore
 
 internal enum AgeRangeDeclaration: String, Enumerable {
   case selfDeclared
@@ -8,7 +8,7 @@ internal enum AgeRangeDeclaration: String, Enumerable {
 
   @available(iOS 26.0, *)
   public init(_ range: AgeRangeService.AgeRangeDeclaration) {
-    #if compiler(>=6.3.2) // Xcode 26.5+ (Swift 6.3.2) ships the iOS 26.5 SDK that defines `.confirmed`.
+    #if compiler(>=6.3.2)  // Xcode 26.5+ (Swift 6.3.2) ships the iOS 26.5 SDK that defines `.confirmed`.
     // `#available` alone isn't enough: it gates the runtime, but the `.confirmed` symbol must also
     // exist at compile time, which it doesn't in SDKs before iOS 26.5.
     if #available(iOS 26.5, *), range == .confirmed {
@@ -65,4 +65,3 @@ internal struct AgeRangeRequestParams: Record {
   @Field
   var threshold3: Int?
 }
-

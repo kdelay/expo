@@ -78,7 +78,9 @@ class LivePhotoView: ExpoView, PHLivePhotoViewDelegate {
 
   // MARK: - PHLivePhotoViewDelegate
 
-  func livePhotoView(_ livePhotoView: PHLivePhotoView, willBeginPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle) {
+  func livePhotoView(
+    _ livePhotoView: PHLivePhotoView, willBeginPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle
+  ) {
     onPlaybackStart()
   }
 

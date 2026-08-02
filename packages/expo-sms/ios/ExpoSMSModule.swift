@@ -1,6 +1,6 @@
+import CoreServices
 import ExpoModulesCore
 import MessageUI
-import CoreServices
 import MobileCoreServices
 import UniformTypeIdentifiers
 
